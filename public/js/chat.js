@@ -16,25 +16,73 @@ const $messageFormInput = $messageForm.querySelector('input');
 const $messageFormButton = $messageForm.querySelector('button');
 const $sendLocationButton = document.querySelector('#send-location');
 const $messages = document.querySelector('#messages');
+const $sidebar = document.querySelector('#sidebar');
 
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML;
 const locMsgTemplate = document.querySelector('#loc-message-template').innerHTML;
+const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML;
+
+// options
+const {username,room} = Qs.parse(location.search, {ignoreQueryPrefix:true});
+// Auto-scrolling
+const autoScroll = () => {
+    // new message
+    const $newMessage = $messages.lastElementChild;
+    // height of new message
+    const newMessageStyles = getComputedStyle($newMessage);
+    const newMessageMargin = parseInt(newMessageStyles.marginBottom);
+    const newMessageHeight = $newMessage.offsetHeight + newMessageMargin;
+    // visible height
+    const visibleHeight = $messages.offsetHeight;
+    // total height of message container
+    const containerHeight = $messages.scrollHeight;
+    // how far scrolled from top
+    const scrollOffset = $messages.scrollTop + visibleHeight;
+    // check if we r at bottom before last message was added
+     if (Math.round(containerHeight - newMessageHeight) <= Math.round(scrollOffset)) {
+         $messages.scrollTop = $messages.scrollHeight;
+     } 
+  
+}
+
+// another way to implement autoscroll
+// const autoScroll = () => {
+//     const element=$messages.lastElementChild;
+//     element.scrollIntoView(false);
+//     // element.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"})
+// }
 
 // render messages using msg template
 socket.on('message', (data) => {
-    //console.log(data);
+    console.log(data);
     const html = Mustache.render(messageTemplate, {
-        message:data
+        username:data.username,
+        createdAt:moment(data.createdAt).format('h:mm a'),
+        message:data.text
     });
     $messages.insertAdjacentHTML("beforeend",html);
+    autoScroll();
 });
 // render share loc messages using loc-msg template
-socket.on('locationMessage', (url) => {
-    //console.log(url);
-    const html = Mustache.render(locMsgTemplate, {url});
+socket.on('locationMessage', (data) => {
+    console.log(data);
+    const html = Mustache.render(locMsgTemplate, {
+        username:data.username,
+        url:data.url,
+        createdAt:moment(data.createdAt).format('h:mm a')});
     $messages.insertAdjacentHTML("beforeend",html)
-})
+    autoScroll();
+});
+// render sidebar using sidebar template
+socket.on('roomData', (data) => {
+    const html = Mustache.render(sidebarTemplate,{
+        room:data.room,
+        users:data.users
+    });
+    $sidebar.innerHTML = html
+});
+
 
 $messageForm.addEventListener('submit',(e) => {
     e.preventDefault();
@@ -74,7 +122,23 @@ $sendLocationButton.addEventListener('click', () => {
             console.log(ackMsg);
         })
     })
-})
+});
+
+// emit event to send username and room to join
+socket.emit('join', {username,room},(error) => {
+    if (error) {
+        alert(error);
+        location.href = '/'
+    }
+});
+
+
+
+
+
+
+
+
 // *******************how to filter bad words *******************
 // const naughtyWords = require("naughty-words");
 //const filter = new Filter()

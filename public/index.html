@@ -5,42 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CHIT-CHAT APP</title>
+    <link rel="icon" href="/img/favicon.png">
+    <link rel="stylesheet" href="/css/styles.min.css">
 </head>
 <body>
-    <h2>kar lo gallan jyada</h2>
-    
-    <div id = "messages"></div>
 
-    <!-- form for chat -->
-    <form id = "chat">
-        <input type="text" placeholder="Type ur msg" name = "chatMsg">
-        <button>Send</button>
-    </form>
-    <button id = "send-location">Send Location</button>
-
-<!-- template to display chat msg -->
-<script id = "message-template" type = "text/html">
-    <div>
-        <p>{{message}}</p>
+    <div class="centered-form">
+        <div class="centered-form__box">
+            <h1>Join</h1>
+            <form action="/chat.html">
+                <label for="">Display Name</label>
+                <input type="text" name = "username" placeholder="Display Name" required>
+                <label for="">Room</label>
+                <input type="text" name = "room" placeholder="Room" required>
+                <button>Join</button>
+            </form>
+        </div>
     </div>
-</script>
-
-<!-- template to display loc sharing msg -->
-<script id = "loc-message-template" type = "text/html">
-    <div>
-        <p><a href="{{url}}" target="_blank">My current Location</a></p>
-    </div>
-</script>
-
-
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.6.0/qs.min.js"></script>
-    
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/chat.js"></script>
 
 </body>
 </html>
